@@ -1,6 +1,6 @@
 const express = require('express')
 const cors = require('cors')
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express()
 const port = 3000
 require('dotenv').config();
@@ -31,6 +31,9 @@ async function run() {
     const db = client.db('cleanliness-db')
     const cleansCollection = db.collection('cleans')
 
+    // collection api 
+    const contributionsCollection = db.collection('contributions');
+
 
 
 //letes 6 data 
@@ -39,8 +42,44 @@ const result = await cleansCollection.find().sort({created_at: -1 }).limit(6).to
   res.send(result)
 })
 
+//letes details 
+app.get('/letest-cleans/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const issue = await cleansCollection.findOne({ _id: new ObjectId(id) });
+    if (!issue) return res.status(404).json({ message: "Issue not found" });
+    res.json(issue);
+  } catch (err) {
+    res.status(400).json({ message: "Invalid ID" });
+  }
+});
+
+// contributionsCollection post
+
+app.post('/contributions', async (req, res) => {
+  try {
+    const data = req.body; 
+    data.date = new Date(); 
+    const result = await contributionsCollection.insertOne(data);
+    res.json({ success: true, data: result });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: 'Contribution save faild' });
+  }
+});
 
 
+// contributionsCollection / get
+
+app.get('/contributions/:issueId', async (req, res) => {
+  const { issueId } = req.params;
+  try {
+    const contributions = await contributionsCollection.find({ issueId }).toArray();
+    res.json(contributions);
+  } catch (err) {
+    res.status(500).json({ message: 'Contributions fetch faild' });
+  }
+});
 
 
 
