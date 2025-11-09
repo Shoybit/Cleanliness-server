@@ -81,6 +81,17 @@ app.get('/contributions/:issueId', async (req, res) => {
   }
 });
 
+// get all issues api
+
+app.get('/all-api', async (req, res) => {
+  try {
+    const result = await cleansCollection.find().toArray(); 
+    res.send(result); 
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: "Failed to fetch data" });
+  }
+});
 
 
     // Send a ping to confirm a successful connection
