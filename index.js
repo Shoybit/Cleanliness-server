@@ -27,11 +27,17 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
-    
+    //api added 
+    const db = client.db('cleanliness-db')
+    const cleansCollection = db.collection('cleans')
 
 
 
-
+//letes 6 data 
+app.get('/letest-cleans', async (req , res ) => {
+const result = await cleansCollection.find().sort({created_at: -1 }).limit(6).toArray()
+  res.send(result)
+})
 
 
 
