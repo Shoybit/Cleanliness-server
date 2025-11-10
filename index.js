@@ -142,8 +142,19 @@ app.get('/all-api', async (req, res) => {
       }
     });
 
+    // Delete issue
+    app.delete('/issues/:id', async (req, res) => {
+      const { id } = req.params;
+      try {
+        const result = await cleansCollection.deleteOne({ _id: new ObjectId(id) });
+        res.json({ success: true, result });
+      } catch (err) {
+        res.status(500).json({ success: false, message: "Delete failed" });
+      }
+    });
 
-    
+
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
