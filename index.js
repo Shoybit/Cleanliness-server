@@ -126,6 +126,23 @@ app.get('/all-api', async (req, res) => {
         res.status(500).send({ error: "Failed to fetch issues" });
       }
     });
+
+    // Update issue
+    app.put('/issues/:id', async (req, res) => {
+      const { id } = req.params;
+      const updatedData = req.body;
+      try {
+        const result = await cleansCollection.updateOne(
+          { _id: new ObjectId(id) },
+          { $set: updatedData }
+        );
+        res.json({ success: true, result });
+      } catch (err) {
+        res.status(500).json({ success: false, message: "Update failed" });
+      }
+    });
+
+
     
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
