@@ -94,6 +94,27 @@ app.get('/all-api', async (req, res) => {
 });
 
 
+// addissue
+
+
+    app.post('/addissue', async (req,res) => {
+
+      const data = req.body
+    const newModel = {
+      ...data,
+      created_at: new Date() 
+    };
+    //
+      console.log(data);
+      const result = await cleansCollection.insertOne(newModel)
+
+      res.send({
+        success: true,
+        result
+      })
+    })
+
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
