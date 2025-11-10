@@ -115,6 +115,18 @@ app.get('/all-api', async (req, res) => {
     })
 
 
+ // My Issues
+    app.get('/my-issues', async (req, res) => {
+      const email = req.query.userEmail;
+      if (!email) return res.status(400).send({ error: "User email required" });
+      try {
+        const issues = await cleansCollection.find({ email }).toArray();
+        res.json(issues);
+      } catch (err) {
+        res.status(500).send({ error: "Failed to fetch issues" });
+      }
+    });
+    
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
@@ -124,13 +136,6 @@ app.get('/all-api', async (req, res) => {
   }
 }
 run().catch(console.dir);
-
-
-
-
-
-
-
 
 app.get('/', (req, res) => {
   res.send('Server is Running !')
