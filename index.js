@@ -153,6 +153,22 @@ app.get('/all-api', async (req, res) => {
       }
     });
 
+    // 
+
+  // My contributions 
+    app.get('/contributions', async (req, res) => {
+      const { email } = req.query; 
+      if (!email) return res.status(400).json({ message: "email query required" });
+
+      try {
+        const contributions = await contributionsCollection.find({ email }).toArray();
+        res.json(contributions);
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Failed Contributions" });
+      }
+    });
+
 
 
     // Send a ping to confirm a successful connection
