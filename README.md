@@ -2,7 +2,19 @@
 
 Backend REST API server for Cleanliness project — built with **Node.js**, **Express**, **MongoDB** (via Mongoose).  
 
----
+ # 🚀 Live Demo
+
+## Frontend Live:
+https://kaleidoscopic-alpaca-0f5158.netlify.app/
+
+## 🔗 Repositories
+🖥️ Frontend Repo
+
+https://github.com/Shoybit/Cleanliness--client?tab=readme-ov-file
+
+## ⚙️ Backend Repo
+
+https://github.com/Shoybit/Cleanliness-server
 
 ## 🔧 Tech Stack & Dependencies
 
