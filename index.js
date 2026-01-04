@@ -229,16 +229,22 @@ app.get('/users', async (req, res) => {
 // dashboard stats
 app.get('/dashboard/stats', async (req, res) => {
   const totalIssues = await cleansCollection.countDocuments();
-  const pendingIssues = await cleansCollection.countDocuments({ status: 'pending' });
-  const resolvedIssues = await cleansCollection.countDocuments({ status: 'resolved' });
+
+  const pendingIssues = await cleansCollection.countDocuments({
+    status: "ongoing",
+  });
+
+  const resolvedIssues = await cleansCollection.countDocuments({
+    status: "ended",
+  });
 
   const byCategory = await cleansCollection.aggregate([
     {
       $group: {
         _id: "$category",
-        count: { $sum: 1 }
-      }
-    }
+        count: { $sum: 1 },
+      },
+    },
   ]).toArray();
 
   res.send({
@@ -247,8 +253,8 @@ app.get('/dashboard/stats', async (req, res) => {
     resolved: resolvedIssues,
     byCategory: byCategory.map(item => ({
       category: item._id,
-      count: item.count
-    }))
+      count: item.count,
+    })),
   });
 });
 
