@@ -25,7 +25,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     //api added 
     const db = client.db('cleanliness-db')
@@ -33,6 +33,9 @@ async function run() {
 
     // collection api 
     const contributionsCollection = db.collection('contributions');
+
+    // User Collection 
+    const usersCollection = db.collection('users');
 
 
 
@@ -170,9 +173,88 @@ app.get('/all-api', async (req, res) => {
     });
 
 
+app.post('/users', async (req, res) => {
+  const { name, email } = req.body;
+
+  if (!email) {
+    return res.status(400).send({ message: "Email is required" });
+  }
+
+  const existingUser = await usersCollection.findOne({ email });
+  if (existingUser) {
+    return res.send({ message: 'User already exists' });
+  }
+
+  const newUser = {
+    name: name || "Anonymous",
+    email,
+    role: 'user',
+    createdAt: new Date(),
+  };
+
+  const result = await usersCollection.insertOne(newUser);
+  res.send(result);
+});
+
+
+// Admin login 
+
+app.patch('/users/admin/:email', async (req, res) => {
+  const email = req.params.email;
+
+  const result = await usersCollection.updateOne(
+    { email },
+    { $set: { role: 'admin' } }
+  );
+
+  res.send(result);
+});
+
+// get user role
+app.get('/users/role/:email', async (req, res) => {
+  const email = req.params.email;
+  const user = await usersCollection.findOne({ email });
+  res.send({ role: user?.role || 'user' });
+});
+
+
+// get all users (admin)
+app.get('/users', async (req, res) => {
+  const users = await usersCollection.find().toArray();
+  res.send(users);
+});
+
+
+
+// dashboard stats
+app.get('/dashboard/stats', async (req, res) => {
+  const totalIssues = await cleansCollection.countDocuments();
+  const pendingIssues = await cleansCollection.countDocuments({ status: 'pending' });
+  const resolvedIssues = await cleansCollection.countDocuments({ status: 'resolved' });
+
+  const byCategory = await cleansCollection.aggregate([
+    {
+      $group: {
+        _id: "$category",
+        count: { $sum: 1 }
+      }
+    }
+  ]).toArray();
+
+  res.send({
+    total: totalIssues,
+    pending: pendingIssues,
+    resolved: resolvedIssues,
+    byCategory: byCategory.map(item => ({
+      category: item._id,
+      count: item.count
+    }))
+  });
+});
+
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
